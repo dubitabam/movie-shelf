@@ -1,0 +1,4 @@
+node_modules/
+.vscode/
+.thumbnail-cache/
+movie-shelf.html
