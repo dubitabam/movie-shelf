@@ -12,6 +12,7 @@ require('colors');
 
 let fs          = require('fs'),
     path        = require('path'),
+    readline    = require('readline'),
     _           = require('lodash'),
     argv        = require('argv'),
     uuid        = require('uuid'),
@@ -22,17 +23,60 @@ let fs          = require('fs'),
 
 let fileIndex = 0,
     ws = null,
+    progress = null,
     tpl = {},
     args = {},
     env = {
         ['page-title']: 'My Movies',
         thumbnailCache: './.thumbnail-cache/',
-        width:          116,
-        height:         170,
-        'zoom-width':   200,
-        'zoom-height':  300
+        width: 116,
+        height: 170,
+        'zoom-width': 200,
+        'zoom-height': 300
     };
 
+
+
+
+function print () {
+    clearProgress();
+    console.log.apply(null, arguments);
+    if (progress)
+        printProgress(progress.current, progress.total, true);
+}
+
+let printProgress = (current, total, noClear) => {
+    let padLeft = (s, len) => {
+        while (s.length < len)
+            s = ` ${s}`;
+        return s;
+    };
+
+    if (progress && !noClear)
+        clearProgress();
+
+    let indicator = progress && progress.indicator.length < 3
+        ? progress.indicator += '.'
+        : '';
+
+    console.log(`Working${indicator} ${padLeft(String(Math.round(current / total * 100)), 6 - indicator.length)}%`);
+
+    progress = {
+        current:    current,
+        total:      total,
+        indicator:  indicator
+    };
+};
+
+let clearProgress = (reset) => {
+    if (progress) {
+        if (reset)
+            progress = false;
+        readline.moveCursor(process.stdout, 0, -1);
+        readline.clearLine(process.stdout, 0);
+        readline.cursorTo(process.stdout, 0);
+    }
+};
 
 
 /**
@@ -558,7 +602,7 @@ let writeFileInfo = (folder, file) => {
 
                         new ffmpeg(file.path)
                             .on('filenames', () => {
-                                console.log('generating thumbnail for:'.cyan, file.name.yellow);
+                                print('generating thumbnail for:'.cyan, file.name.yellow);
                             })
                             .on('end', () => {
                                 resizeAndRemove(filename)
@@ -588,10 +632,10 @@ let writeFileInfo = (folder, file) => {
                                 reject();
                             })
                             // .on('stderr', (err) => {
-                            //     console.log(err);
+                            //     print(err);
                             // })
                             // .on('start', function(commandLine) {
-                            //     console.log('spawned ffmpeg with command: ' + commandLine);
+                            //     print('spawned ffmpeg with command: ' + commandLine);
                             // })
                             .screenshots({
                                 count:      1,
@@ -729,7 +773,7 @@ let writeFileInfo = (folder, file) => {
 
 let processFolder = (folder, parent, totalFiles) => {
     return new Promise((resolve) => {
-        console.log('processing folder'.cyan, folder.path.green);
+        print('processing folder'.cyan, folder.path.green);
 
         let processSubFolder = (subFolder, index) => {
             return new Promise((resolve) => {
@@ -765,22 +809,13 @@ let processFolder = (folder, parent, totalFiles) => {
                             }
                         };
 
-                        let getProgress = (index) => {
-                            let maxLen = String(totalFiles).length,
-                                padLeft = (s) => {
-                                    while (String(s).length < maxLen)
-                                        s = ` ${String(s)}`;
-                                    return s;
-                                };
-                            return `${padLeft(index)}/${String(totalFiles)}`;
-                        };
-
                         if (!args.folderLast && index === 0 && folder.subs.length) {
                             processSubFolder(folder.subs, 0)
                                 .then(() => {
                                     if (folder.files.length && index < folder.files.length) {
                                         let file = folder.files[index];
-                                        console.log(getProgress(++fileIndex), 'processing file:'.cyan, file.name.yellow);
+                                        print('processing file:'.cyan, file.name.yellow);
+                                        printProgress(++fileIndex, totalFiles);
                                         writeFileInfo(folder, file)
                                             .then(nextFileOrContinue);
                                     } else
@@ -788,7 +823,8 @@ let processFolder = (folder, parent, totalFiles) => {
                                 });
                         } else if (folder.files.length && index < folder.files.length) {
                             let file = folder.files[index];
-                            console.log(getProgress(++fileIndex), 'processing file:'.cyan, file.name.yellow);
+                            print('processing file:'.cyan, file.name.yellow);
+                            printProgress(++fileIndex, totalFiles);
                             writeFileInfo(folder, file)
                                 .then(nextFileOrContinue);
                         } else {
@@ -878,20 +914,21 @@ if ((args = processArguments()) !== null) {
 
     let fileMap = createFileMap(args.directory);
     if (fileMap) {
-        console.log('Found'.red, fileMap.total, 'file(s)'.red);
+        print('Found'.red, fileMap.total, 'file(s)'.red);
         env.files = fileMap.total;
         ws.write(parseTemplate(tpl.header), args.encoding, () => {
             processFolder(fileMap, null, fileMap.total)
                 .then(() => {
                     if (!args.keepThumbnails)
                         deleteFolder(env.thumbnailCache);
-                    console.log('finished...'.green);
+                    print('finished...'.green);
+                    clearProgress(true);
                     ws.write(parseTemplate(tpl.footer), args.encoding, () => {
                         ws.close();
                     });
                 });
         });
     } else
-        console.log('No files found...'.red);
+        print('No files found...'.red);
 }
 
