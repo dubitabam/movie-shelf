@@ -5,6 +5,7 @@
             html, body {
                 height: 100%;
             }
+
             body {
                 position: relative;
                 margin: 40px 0 0 0;
@@ -166,6 +167,7 @@
 
             #details .info {
                 position: relative;
+                max-width: 700px;
                 height: auto;
                 width: auto;
                 overflow-x: hidden;
@@ -395,6 +397,7 @@
                                    formatSize(elm.dataset.size) +
                                    '<span class="paragraph"><a href="http://www.imdb.com/find?q=' + elm.title + '" target="_blank">Search on IMDB</a></span>' +
                                    '<span class="paragraph">Path:&nbsp;<a href="' + elm.dataset.path + '">' + elm.dataset.path + '</a></span>' +
+                                   '<span class="paragraph">' + elm.dataset.comment + '</span>' +
                                    formatStreams(elm.dataset.streams);
 
             if (fileCover)
@@ -453,6 +456,7 @@
      data-duration="4610.135"
      data-date="2014-05-05T10:35:34.000000Z"
      data-path="/movies/Asterix - Operation Hinkelstein.mp4"
+     data-comment="The druid is accidentally hit by a menhir thrown by Obelix and loses his mind and memory."
      title="Asterix - Operation Hinkelstein"
      onclick="showDetails(this)"
      onmouseout="hideCover(event)"
@@ -463,7 +467,7 @@
     <div class="info">
         <div class="title">Asterix - Operation Hinkelstein</div>
         <div class="year"></div>
-        <div class="genre"></div>
+        <div class="genre">Animation, Adventure, Comedy</div>
         <div class="type">MP4</div>
     </div>
 </div>
@@ -475,6 +479,7 @@
      data-duration="4462.96"
      data-date=""
      data-path="/movies/Asterix - Sieg über Cäsar.mp4"
+     data-comment="Obelix falls for a new arrival in his home village in Gaul, but is heartbroken when her true love arrives to visit her. However, the lovers are kidnapped by Romans; Asterix and Obelix set out to rescue them on a dangerous journey that will involve gladiators, slavers and beauracracy - and a personal encounter with the Emperor himself, Julius Caesar..."
      title="Asterix - Sieg über Cäsar"
      onclick="showDetails(this)"
      onmouseout="hideCover(event)"
@@ -485,7 +490,7 @@
     <div class="info">
         <div class="title">Asterix - Sieg über Cäsar</div>
         <div class="year"></div>
-        <div class="genre"></div>
+        <div class="genre">Animation, Adventure, Comedy</div>
         <div class="type">MP4</div>
     </div>
 </div>
@@ -497,6 +502,7 @@
      data-duration="4545.24"
      data-date=""
      data-path="/movies/Asterix bei den Briten.mp4"
+     data-comment="The diminutive Asterix and his rather larger companion Obelix, warriors of the last village in Gaul still free after the Roman invasion, set out on a mission to deliver a barrel of their druid's famous magic potion to help Asterix's cousin in Britain fight off the invading Roman army."
      title="Asterix bei den Briten"
      onclick="showDetails(this)"
      onmouseout="hideCover(event)"
@@ -507,7 +513,7 @@
     <div class="info">
         <div class="title">Asterix bei den Briten</div>
         <div class="year"></div>
-        <div class="genre"></div>
+        <div class="genre">Animation, Adventure, Comedy</div>
         <div class="type">MP4</div>
     </div>
 </div>
@@ -519,6 +525,7 @@
      data-duration="3884.32"
      data-date=""
      data-path="/movies/Asterix der Gallier.mp4"
+     data-comment="Gaul invaded! Asterix must save the Druid Getafix from the Romans."
      title="Asterix der Gallier"
      onclick="showDetails(this)"
      onmouseout="hideCover(event)"
@@ -529,7 +536,7 @@
     <div class="info">
         <div class="title">Asterix der Gallier</div>
         <div class="year"></div>
-        <div class="genre"></div>
+        <div class="genre">Animation, Adventure, Comedy</div>
         <div class="type">MP4</div>
     </div>
 </div>
@@ -541,6 +548,7 @@
      data-duration="4550.2"
      data-date=""
      data-path="/movies/Asterix erobert Rom.mp4"
+     data-comment="The Gauls have the chance to become the new masters of the Roman empire if they can solve twelve tasks set by Julius Cesar."
      title="Asterix erobert Rom"
      onclick="showDetails(this)"
      onmouseout="hideCover(event)"
@@ -551,7 +559,7 @@
     <div class="info">
         <div class="title">Asterix erobert Rom</div>
         <div class="year"></div>
-        <div class="genre"></div>
+        <div class="genre">Animation, Adventure, Comedy</div>
         <div class="type">MP4</div>
     </div>
 </div>
@@ -563,6 +571,7 @@
      data-duration="4849.08"
      data-date=""
      data-path="/movies/Asterix in Amerika.mp4"
+     data-comment="Caesar has had enough when another legion is hacked to pieces by the damned single indomitable village in Gaul because of the druid's magic potion, so he decides to tackle the problem at ..."
      title="Asterix in Amerika"
      onclick="showDetails(this)"
      onmouseout="hideCover(event)"
@@ -573,7 +582,7 @@
     <div class="info">
         <div class="title">Asterix in Amerika</div>
         <div class="year"></div>
-        <div class="genre"></div>
+        <div class="genre">Animation, Adventure, Comedy</div>
         <div class="type">MP4</div>
     </div>
 </div>
