@@ -159,6 +159,10 @@ let processArguments = () => {
             type:           'bool',
             description:    'Files first'
         }, {
+            name:           'no-recursive',
+            type:           'bool',
+            description:    'Don\'t process sub folder.'
+        }, {
             name:           'templates',
             type:           'path',
             description:    'Path to the templates, default ./templates',
@@ -166,13 +170,18 @@ let processArguments = () => {
         }, {
             name:           'extensions',
             type:           'csv,string',
-            description:    'File extensions considered as movies, default mp4,avi,xvid',
-            example:        '--extensions=mp4,avi,xvid'
+            description:    'File extensions considered as movies, default mp4,avi,xvid,flv,mpeg',
+            example:        '--extensions=mp4,avi'
         }, {
             name:           'encoding',
             type:           'encoding',
             description:    'Character encoding, default utf8',
             example:        '--encoding=utf8'
+        }, {
+            name:           'page-title',
+            type:           'string',
+            description:    'The page title... duh',
+            example:        '--page-title="My Movies"'
         }, {
             name:           'cover-strategy',
             type:           'csv,string',
@@ -181,8 +190,8 @@ let processArguments = () => {
         }, {
             name:           'thumbnail-time',
             type:           'string',
-            description:    'Time offset for thumbnails.',
-            example:        '--thumbnail-time=30%'
+            description:    'Time offset for thumbnails. Percentage or seconds',
+            example:        '--thumbnail-time=30% or --thumbnail-time=120'
         }, {
             name:           'size',
             type:           'size',
@@ -207,14 +216,12 @@ let processArguments = () => {
             type:           'bool',
             description:    'Do not delete the thumbnail cache.'
         }, {
-            name:           'page-title',
-            type:           'string',
-            description:    'The page title... duh',
-            example:        '--page-title="My Movies"'
-        }, {
-            name:           'no-recursive',
-            type:           'bool',
-            description:    'Don\'t process sub folder.'
+            name:           'filter',
+            type:           'list,string',
+            description:    'Regular expression to filter files. Applies to the full path.\n\t\t' +
+                            'Multiple filters are combined with OR.\n\t\t' +
+                            'To negate a filter use a regex like ^((?!asterix).)*$',
+            example:        '--filter=asterix --filter=\'^((?!obelix).)*$\''
         }, {
             name:           'env',
             type:           'list,env',
@@ -293,6 +300,7 @@ let processArguments = () => {
 
     return _.extend({
         eval:           true,
+        filter:         null,
         noResize:       false,
         quality:        30,
         file:           'movie-shelf.html',
@@ -479,6 +487,12 @@ let createFileMap = (directory) => {
         return !!x.match(re);
     };
 
+    let filterApplies = (path) => {
+        if (!_.isEmpty(args.filter))
+            return path.match(RegExp(`(?:${args.filter.join(')(')})`, 'gi'));
+        return true;
+    };
+
     if (directoryContent && directoryContent.length) {
         _.each(directoryContent, (x) => {
             let fullpath = path.join(directory, x),
@@ -492,7 +506,7 @@ let createFileMap = (directory) => {
                 }
             }
 
-            else if (stats.isFile() && isMovieFile(fullpath)) {
+            else if (stats.isFile() && isMovieFile(fullpath) && filterApplies(fullpath)) {
                 // search for name.jpg .png ....
                 let coverFile = _.find(directoryContent, (file) => {
                     if (isImageFile(file)) {
