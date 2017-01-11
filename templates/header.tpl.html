@@ -167,6 +167,7 @@
 
             #details .info {
                 position: relative;
+                max-width: 700px;
                 height: auto;
                 width: auto;
                 overflow-x: hidden;
@@ -396,6 +397,7 @@
                                    formatSize(elm.dataset.size) +
                                    '<span class="paragraph"><a href="http://www.imdb.com/find?q=' + elm.title + '" target="_blank">Search on IMDB</a></span>' +
                                    '<span class="paragraph">Path:&nbsp;<a href="' + elm.dataset.path + '">' + elm.dataset.path + '</a></span>' +
+                                   '<span class="paragraph">' + elm.dataset.comment + '</span>' +
                                    formatStreams(elm.dataset.streams);
 
             if (fileCover)

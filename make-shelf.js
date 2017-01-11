@@ -684,15 +684,13 @@ let writeFileInfo = (folder, file) => {
         };
 
         let getFileInfo = (tags) => {
-            let fileInfo = {
+            let fileInfo = _.extend(tags || {}, {
                 id:             file.id,
                 'parent-id':    folder.id,
                 file:           file.name,
                 path:           file.path,
                 type:           path.extname(file.name).substr(1).toUpperCase(),
                 title:          tags && tags.title ? tags.title : file.name.replace(path.extname(file.name), ''),
-                year:           tags && tags.year ? tags.year : '',
-                genre:          tags && tags.genre ? tags.genre : '',
                 cover:          tags && tags.picture ? tpl.cover : '',
                 image:          tags && tags.picture
                                     ? getResizedBase64ImageFromBuffer(new Buffer(tags.picture.data), tags.picture.format.replace('image/', ''))
@@ -701,7 +699,7 @@ let writeFileInfo = (folder, file) => {
                 duration:       '',
                 date:           '',
                 streams:        ''
-            };
+            });
 
             ffmpeg.ffprobe(file.path, function (err, metadata) {
                 if (metadata && metadata.format) {
