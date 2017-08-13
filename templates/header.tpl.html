@@ -112,6 +112,15 @@
             #zoom .info {
                 height: 34px;
             }
+            #zoom .info .artist,
+            #zoom .info .composer,
+            #zoom .info .genre {
+                display: none;
+            }
+            #zoom .info .type {
+                float: right;
+                margin-right: 4px;
+            }
 
 
             #details {
@@ -380,6 +389,8 @@
 
             var fileCover = elm.getElementsByClassName('cover')[0].getElementsByTagName('div')[0];
             var fileYear = elm.getElementsByClassName('year')[0].innerHTML;
+            var fileArtist = elm.getElementsByClassName('artist')[0].innerHTML;
+            var fileComposer = elm.getElementsByClassName('composer')[0].innerHTML;
             var fileGenre = elm.getElementsByClassName('genre')[0].innerHTML;
             var fileType = elm.getElementsByClassName('type')[0].innerHTML;
 
@@ -391,6 +402,8 @@
             detailsTitle.innerHTML = elm.title;
             detailInfo.innerHTML = formatString(fileType, 'Type: ') +
                                    formatString(fileYear, 'Year: ') +
+                                   formatString(fileArtist, 'Stars: ') +
+                                   formatString(fileComposer, 'Director: ') +
                                    formatString(fileGenre, 'Genre: ') +
                                    formatDate(elm.dataset.date) +
                                    formatDuration(elm.dataset.duration) +

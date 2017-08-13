@@ -10,15 +10,16 @@
 'use strict';
 require('colors');
 
-let fs          = require('fs'),
-    path        = require('path'),
-    readline    = require('readline'),
-    _           = require('lodash'),
-    argv        = require('argv'),
-    uuid        = require('uuid'),
-    jsmediatags = require('jsmediatags'),
-    ffmpeg      = require('fluent-ffmpeg'),
-    lwip        = require('lwip');
+let fs              = require('fs'),
+    path            = require('path'),
+    readline        = require('readline'),
+    _               = require('lodash'),
+    argv            = require('argv'),
+    uuid            = require('uuid'),
+    jsmediatags     = require('jsmediatags'),
+    mp4TagReader    = require('jsmediatags/build2/MP4TagReader'),
+    ffmpeg          = require('fluent-ffmpeg'),
+    lwip            = require('lwip');
 
 
 let fileIndex = 0,
@@ -36,6 +37,47 @@ let fileIndex = 0,
     };
 
 
+const SHORTCUTS = {
+    'title': '©nam',
+    'artist': '©ART',
+    'album': '©alb',
+    'year': '©day',
+    'comment': '©cmt',
+    'track': 'trkn',
+    'genre': '©gen',
+    'picture': 'covr',
+    'lyrics': '©lyr',
+    'composer': '©wrt'
+};
+
+
+class ExMP4TagReader extends mp4TagReader {
+    _parseData(data, tagsToRead) {
+        var tags = {};
+
+        tagsToRead = this._expandShortcutTags(tagsToRead);
+        this._readAtom(tags, data, 0, data.getSize(), tagsToRead);
+
+        // create shortcuts for most common data.
+        for (var name in SHORTCUTS) if (SHORTCUTS.hasOwnProperty(name)) {
+            var tag = tags[SHORTCUTS[name]];
+            if (tag) {
+                if (name === 'track') {
+                    tags[name] = tag.data.track;
+                } else {
+                    tags[name] = tag.data;
+                }
+            }
+        }
+
+        return {
+            'type': 'MP4',
+            'ftyp': data.getStringAt(8, 4),
+            'version': data.getLongAt(12, true),
+            'tags': tags
+        };
+    }
+}
 
 
 function print () {
@@ -362,17 +404,19 @@ let isImageFile = (file) => {
  */
 let readTag = (file) => {
     return new Promise((resolve, reject) => {
-        jsmediatags.read(file, {
-            onSuccess: function (tag) {
-                if (tag && tag.tags)
-                    resolve(tag.tags);
-                else
-                    reject();
-            },
-            onError: function (err) {
-                reject(err);
-            }
-        });
+        new jsmediatags.Reader(file)
+            .setTagReader(ExMP4TagReader)
+            .read({
+                onSuccess: function (tag) {
+                    if (tag && tag.tags)
+                        resolve(tag.tags);
+                    else
+                        reject();
+                },
+                onError: function (err) {
+                    reject(err);
+                }
+            });
     });
 };
 
@@ -914,7 +958,7 @@ let parseTemplate = (template, patterns) => {
         let re = RegExp(`<#\\s*${key}\\s*#>`, 'gi');
         template = template.replace(re, value === undefined || value === null ? '' : value);
     });
-    return template;
+    return template.replace(/<#.+#>/gi, '');
 };
 
 
