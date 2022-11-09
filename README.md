@@ -10,7 +10,7 @@ generate thumbnails.
 
 Use ```make-shelf.js -h``` for options.
 
-Click [here](https://daevidpreis.github.io/movie-shelf/) for a demo.
+Click [here](https://dubitabam.github.io/movie-shelf/) for a demo.
 
 ----
 
